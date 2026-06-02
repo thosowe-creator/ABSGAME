@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABS Zone Challenge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero card">
+      <div>
+        <p class="eyebrow">KBO ABS 기준 미니게임</p>
+        <h1>ABS Zone Challenge</h1>
+        <p class="subtitle">공이 존에 걸쳤는지 보고 <strong>스트라이크 / 볼</strong>을 맞혀보세요. 포수 미트질은 장식입니다.</p>
+      </div>
+      <div class="score-board" aria-label="점수판">
+        <div>
+          <span id="score">0</span>
+          <small>정답</small>
+        </div>
+        <div>
+          <span id="streak">0</span>
+          <small>연속</small>
+        </div>
+        <div>
+          <span id="accuracy">0%</span>
+          <small>정확도</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="game-grid">
+      <aside class="card controls-card">
+        <h2>설정</h2>
+
+        <label class="field">
+          <span>난이도</span>
+          <select id="difficulty">
+            <option value="easy">쉬움 - 확실한 공 위주</option>
+            <option value="normal" selected>보통 - 경계 공 섞임</option>
+            <option value="hard">어려움 - 애매한 공 많음</option>
+            <option value="hell">심판 지옥 - 1~2cm 싸움</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>타자 키 <b id="heightValue">180cm</b></span>
+          <input id="batterHeight" type="range" min="165" max="195" value="180" />
+        </label>
+
+        <label class="field check-field">
+          <input id="showCatcher" type="checkbox" checked />
+          <span>포수 미트 낚시 표시</span>
+        </label>
+
+        <div class="zone-info">
+          <div><span>좌우 존</span><strong>47.18cm</strong></div>
+          <div><span>상단</span><strong id="topInfo">100.4cm</strong></div>
+          <div><span>하단</span><strong id="bottomInfo">48.7cm</strong></div>
+        </div>
+
+        <button id="newPitch" class="ghost-btn">새 공 던지기</button>
+        <button id="resetGame" class="ghost-btn subtle">점수 초기화</button>
+      </aside>
+
+      <section class="card play-card">
+        <div class="canvas-head">
+          <div>
+            <h2>포수 뒤 시점</h2>
+            <p id="pitchMeta">투구를 준비 중입니다.</p>
+          </div>
+          <span id="lockBadge" class="badge">판정 대기</span>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="zoneCanvas" width="720" height="540" aria-label="ABS 존 판정 캔버스"></canvas>
+        </div>
+
+        <div class="answer-row">
+          <button id="strikeBtn" class="answer-btn strike">스트라이크</button>
+          <button id="ballBtn" class="answer-btn ball">볼</button>
+        </div>
+      </section>
+
+      <section class="card result-card">
+        <h2>판정 결과</h2>
+        <div id="resultPanel" class="result-panel waiting">
+          <strong>아직 판정 전입니다.</strong>
+          <p>공 위치를 보고 스트라이크인지 볼인지 선택하세요.</p>
+        </div>
+
+        <div class="detail-grid">
+          <div>
+            <span>공 중심 X</span>
+            <strong id="xDetail">-</strong>
+          </div>
+          <div>
+            <span>공 중심 높이</span>
+            <strong id="zDetail">-</strong>
+          </div>
+          <div>
+            <span>가로 여유</span>
+            <strong id="xMargin">-</strong>
+          </div>
+          <div>
+            <span>세로 여유</span>
+            <strong id="zMargin">-</strong>
+          </div>
+        </div>
+
+        <div class="explain">
+          <h3>이 게임의 ABS 판정식</h3>
+          <p>홈플레이트 폭 43.18cm에 좌우 2cm씩 더한 폭을 사용하고, 공의 <b>중심</b>이 아니라 <b>외곽</b>이 존에 닿으면 스트라이크로 처리합니다.</p>
+          <code>공 오른쪽 ≥ 존 왼쪽 && 공 왼쪽 ≤ 존 오른쪽 && 공 위 ≥ 존 하단 && 공 아래 ≤ 존 상단</code>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

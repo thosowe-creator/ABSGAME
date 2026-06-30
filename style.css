@@ -1,14 +1,14 @@
 :root {
-  --bg: #09111f;
-  --card: rgba(255, 255, 255, 0.08);
-  --line: rgba(255, 255, 255, 0.16);
-  --text: #f4f7fb;
-  --muted: #a9b4c6;
-  --accent: #8bd3ff;
-  --good: #54e0a8;
-  --bad: #ff7c7c;
-  --warn: #ffd36e;
-  --shadow: 0 24px 80px rgba(0,0,0,.35);
+  --bg: #f4f8ff;
+  --card: rgba(255, 255, 255, 0.84);
+  --line: rgba(53, 89, 128, 0.18);
+  --text: #17243a;
+  --muted: #5f6f86;
+  --accent: #2378d4;
+  --good: #12a878;
+  --bad: #e05252;
+  --warn: #b57900;
+  --shadow: 0 24px 70px rgba(55, 92, 132, .18);
 }
 
 * { box-sizing: border-box; }
@@ -19,9 +19,9 @@ body {
   font-family: Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 18% 10%, rgba(78, 181, 255, .24), transparent 34%),
-    radial-gradient(circle at 88% 14%, rgba(84, 224, 168, .16), transparent 28%),
-    linear-gradient(135deg, #08101d 0%, #111827 50%, #0b1020 100%);
+    radial-gradient(circle at 18% 10%, rgba(108, 184, 255, .34), transparent 34%),
+    radial-gradient(circle at 88% 14%, rgba(116, 224, 184, .24), transparent 28%),
+    linear-gradient(135deg, #f8fbff 0%, #eef7ff 52%, #fff8ea 100%);
 }
 
 button, input, select { font: inherit; }
@@ -81,7 +81,7 @@ h1 {
   overflow: hidden;
   border-radius: 22px;
   border: 1px solid var(--line);
-  background: rgba(0,0,0,.18);
+  background: rgba(255,255,255,.62);
 }
 
 .score-board div {
@@ -124,7 +124,7 @@ select {
   appearance: none;
   border: 1px solid var(--line);
   color: var(--text);
-  background: rgba(0,0,0,.22);
+  background: rgba(255,255,255,.74);
   border-radius: 16px;
   padding: 13px 14px;
   outline: none;
@@ -142,7 +142,7 @@ input[type="range"] { accent-color: var(--accent); }
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 13px;
-  background: rgba(0,0,0,.16);
+  background: rgba(255,255,255,.58);
 }
 
 .zone-info span, .detail-grid span {
@@ -159,7 +159,7 @@ input[type="range"] { accent-color: var(--accent); }
   border: 0;
   border-radius: 16px;
   padding: 14px 16px;
-  color: #06101d;
+  color: #ffffff;
   background: linear-gradient(135deg, #8bd3ff, #54e0a8);
   font-weight: 900;
   cursor: pointer;
@@ -167,7 +167,7 @@ input[type="range"] { accent-color: var(--accent); }
   margin-top: 8px;
 }
 .ghost-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
-.ghost-btn.subtle { background: rgba(255,255,255,.12); color: var(--text); border: 1px solid var(--line); }
+.ghost-btn.subtle { background: rgba(255,255,255,.72); color: var(--text); border: 1px solid var(--line); }
 
 .canvas-head {
   display: flex;
@@ -184,7 +184,7 @@ input[type="range"] { accent-color: var(--accent); }
   padding: 8px 12px;
   border: 1px solid var(--line);
   color: var(--muted);
-  background: rgba(0,0,0,.22);
+  background: rgba(255,255,255,.74);
   font-weight: 800;
   font-size: 13px;
 }
@@ -198,8 +198,8 @@ input[type="range"] { accent-color: var(--accent); }
   border-radius: 24px;
   overflow: hidden;
   background:
-    radial-gradient(circle at center 72%, rgba(139,211,255,.14), transparent 45%),
-    linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    radial-gradient(circle at center 72%, rgba(92, 171, 91, .18), transparent 45%),
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(227,242,255,.62));
 }
 
 canvas {
@@ -219,7 +219,7 @@ canvas {
   border: 0;
   border-radius: 20px;
   padding: 18px 14px;
-  color: #06101d;
+  color: #ffffff;
   font-size: 19px;
   font-weight: 950;
   cursor: pointer;
@@ -235,7 +235,7 @@ canvas {
   padding: 18px;
   border-radius: 20px;
   border: 1px solid var(--line);
-  background: rgba(0,0,0,.18);
+  background: rgba(255,255,255,.62);
   margin-bottom: 14px;
 }
 .result-panel strong { display: block; font-size: 24px; margin-bottom: 8px; letter-spacing: -.03em; }
@@ -271,4 +271,15 @@ canvas {
   .game-grid { grid-template-columns: 1fr; }
   .canvas-head { flex-direction: column; }
   .answer-row { grid-template-columns: 1fr; }
+}
+
+.height-card strong {
+  font-size: 30px;
+  color: var(--accent);
+  letter-spacing: -.04em;
+}
+
+.height-card small {
+  color: var(--muted);
+  line-height: 1.45;
 }

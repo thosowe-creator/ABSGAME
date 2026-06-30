@@ -3,7 +3,6 @@ const ctx = canvas.getContext('2d');
 
 const els = {
   difficulty: document.querySelector('#difficulty'),
-  height: document.querySelector('#batterHeight'),
   heightValue: document.querySelector('#heightValue'),
   topInfo: document.querySelector('#topInfo'),
   bottomInfo: document.querySelector('#bottomInfo'),
@@ -30,14 +29,17 @@ const ABS = {
   ballRadius: 3.65,
   topRatio: 0.5575,
   bottomRatio: 0.2704,
+  moundDistance: 18.44,
 };
 
 const pitchTypes = [
-  { name: '직구', speed: [144, 156] },
-  { name: '체인지업', speed: [124, 136] },
-  { name: '슬라이더', speed: [132, 144] },
-  { name: '커브', speed: [112, 128] },
-  { name: '포크볼', speed: [128, 140] },
+  { name: '포심 패스트볼', speed: [143, 158] },
+  { name: '투심 패스트볼', speed: [139, 152] },
+  { name: '커터', speed: [135, 148] },
+  { name: '슬라이더', speed: [128, 143] },
+  { name: '체인지업', speed: [120, 136] },
+  { name: '커브', speed: [108, 126] },
+  { name: '스플리터', speed: [126, 142] },
 ];
 
 let state = {
@@ -72,8 +74,12 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function randomHeight() {
+  return Math.round(rand(165, 195));
+}
+
 function randomPitch() {
-  const height = Number(els.height.value);
+  const height = randomHeight();
   const zone = zoneForHeight(height);
   const difficulty = els.difficulty.value;
   const type = pick(pitchTypes);
@@ -131,12 +137,14 @@ function randomPitch() {
     startZ,
     type,
     speed,
+    height,
+    zone,
     seed: Math.random(),
   };
 }
 
 function isStrike(pitch) {
-  const zone = zoneForHeight(Number(els.height.value));
+  const zone = pitch.zone || zoneForHeight(pitch.height);
   return (
     pitch.x + ABS.ballRadius >= zone.left &&
     pitch.x - ABS.ballRadius <= zone.right &&
@@ -146,7 +154,7 @@ function isStrike(pitch) {
 }
 
 function margins(pitch) {
-  const zone = zoneForHeight(Number(els.height.value));
+  const zone = pitch.zone || zoneForHeight(pitch.height);
   const leftGap = pitch.x + ABS.ballRadius - zone.left;
   const rightGap = zone.right - (pitch.x - ABS.ballRadius);
   const bottomGap = pitch.z + ABS.ballRadius - zone.bottom;
@@ -163,7 +171,7 @@ function margins(pitch) {
 }
 
 function getViewport() {
-  const zone = zoneForHeight(Number(els.height.value));
+  const zone = state.pitch?.zone || zoneForHeight(180);
   const margin = 26;
   const worldHeight = zone.height + margin * 2;
   const worldWidth = zone.width + margin * 2;
@@ -192,7 +200,7 @@ function currentBallPosition() {
   return {
     x: pitch.startX + (pitch.x - pitch.startX) * t + wobble,
     z: pitch.startZ + (pitch.z - pitch.startZ) * t,
-    depthScale: 0.24 + 0.76 * t,
+    depthScale: 1.18 - 0.70 * t,
   };
 }
 
@@ -218,7 +226,7 @@ function drawBackground() {
   ctx.fillRect(0, 0, w, h);
 
   ctx.save();
-  ctx.fillStyle = 'rgba(84, 224, 168, 0.08)';
+  ctx.fillStyle = 'rgba(87, 142, 72, 0.16)';
   ctx.beginPath();
   ctx.ellipse(w / 2, h * 0.73, w * 0.48, h * 0.18, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -260,6 +268,67 @@ function drawPlate(zoneRect) {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
+  ctx.restore();
+}
+
+function drawCatcherAndBatter(zoneRect) {
+  const catcherX = canvas.width / 2;
+  const catcherY = zoneRect.y + zoneRect.height * 0.58;
+  const batterSide = state.pitch?.x >= 0 ? -1 : 1;
+  const batterX = catcherX + batterSide * (zoneRect.width * 0.86);
+  const batterY = zoneRect.y + zoneRect.height * 0.50;
+
+  ctx.save();
+
+  // Catcher: intentionally simple, but large enough to read from a pitcher's 18.44m view.
+  ctx.fillStyle = 'rgba(42, 67, 96, 0.92)';
+  ctx.strokeStyle = 'rgba(14, 32, 55, 0.78)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.ellipse(catcherX, catcherY + 72, zoneRect.width * 0.23, zoneRect.height * 0.22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(247, 118, 118, 0.94)';
+  ctx.beginPath();
+  ctx.roundRect(catcherX - 38, catcherY - 22, 76, 82, 20);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(31, 45, 68, 0.96)';
+  ctx.beginPath();
+  ctx.roundRect(catcherX - 30, catcherY - 68, 60, 48, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255, 220, 156, 0.92)';
+  ctx.beginPath();
+  ctx.ellipse(catcherX + 74, catcherY + 8, 24, 34, -0.25, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Batter silhouette.
+  ctx.fillStyle = 'rgba(50, 62, 84, 0.82)';
+  ctx.strokeStyle = 'rgba(20, 28, 42, 0.56)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(batterX, batterY - 62, 25, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.roundRect(batterX - 24, batterY - 34, 48, 126, 24);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(133, 86, 42, 0.95)';
+  ctx.lineWidth = 11;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(batterX + batterSide * 18, batterY - 76);
+  ctx.lineTo(batterX + batterSide * 66, batterY - 150);
+  ctx.stroke();
+
   ctx.restore();
 }
 
@@ -314,14 +383,8 @@ function drawHiddenGuide() {
     width: bottomRight.x - topLeft.x,
     height: bottomRight.y - topLeft.y,
   };
+  drawCatcherAndBatter(rect);
   drawPlate(rect);
-
-  ctx.save();
-  ctx.strokeStyle = 'rgba(255,255,255,0.09)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([7, 9]);
-  ctx.strokeRect(rect.x - 18, rect.y - 18, rect.width + 36, rect.height + 36);
-  ctx.restore();
   return rect;
 }
 
@@ -395,6 +458,7 @@ function draw() {
 
   let zoneRect;
   if (state.answered) {
+    drawHiddenGuide();
     zoneRect = drawZone();
     drawPlate(zoneRect);
   } else {
@@ -452,10 +516,9 @@ function updateAnimation(timestamp) {
   }
 }
 
-function updateZoneInfo() {
-  const height = Number(els.height.value);
-  const zone = zoneForHeight(height);
-  els.heightValue.textContent = `${height}cm`;
+function updateZoneInfo(height = state.pitch?.height || 180) {
+  const zone = state.pitch?.zone || zoneForHeight(height);
+  els.heightValue.textContent = state.pitch ? `${height}cm` : '새 투구 시 랜덤';
   els.topInfo.textContent = `${zone.top.toFixed(1)}cm`;
   els.bottomInfo.textContent = `${zone.bottom.toFixed(1)}cm`;
   els.zoneHeightInfo.textContent = `${zone.height.toFixed(1)}cm`;
@@ -474,8 +537,8 @@ function clearDetails() {
 }
 
 function newPitch() {
-  updateZoneInfo();
   state.pitch = randomPitch();
+  updateZoneInfo(state.pitch.height);
   state.answered = false;
   state.animating = true;
   state.animationProgress = 0;
@@ -485,10 +548,10 @@ function newPitch() {
   els.lockBadge.textContent = '투구 중';
   els.lockBadge.className = 'badge';
   els.resultPanel.className = 'result-panel waiting';
-  els.resultPanel.innerHTML = '<strong>공이 들어옵니다.</strong><p>도착 후 판정을 선택하세요.</p>';
+  els.resultPanel.innerHTML = '<strong>공이 들어옵니다.</strong><p>포수 미트에 도착한 뒤 판정을 선택하세요.</p>';
 
   const { type, speed } = state.pitch;
-  els.pitchMeta.textContent = `${type.name} · ${speed}km/h · 타자 키 ${els.height.value}cm`;
+  els.pitchMeta.textContent = `${type.name} · ${speed}km/h · ${ABS.moundDistance}m 투수 시점 · 타자 ${state.pitch.height}cm`;
   clearDetails();
   requestAnimationFrame(updateAnimation);
 }
@@ -561,10 +624,6 @@ els.newPitch.addEventListener('click', newPitch);
 els.resetGame.addEventListener('click', resetGame);
 els.strikeBtn.addEventListener('click', () => answer(true));
 els.ballBtn.addEventListener('click', () => answer(false));
-els.height.addEventListener('input', () => {
-  updateZoneInfo();
-  if (!state.answered && !state.animating) draw();
-});
 els.difficulty.addEventListener('change', newPitch);
 
 window.addEventListener('keydown', (event) => {
